@@ -33,7 +33,10 @@ class Groups {
                     res.writeHead(200, {"Content-Type": "text/json"});
                 }
 
-                res.end(JSON.stringify(result));
+                let jsonResult = JSON.stringify(result);
+                out.logToFile(jsonResult);
+
+                res.end(jsonResult);
             });
         } else {
             db.getAllGroups(startIndex, count, reqUrl, function (result) {
@@ -49,7 +52,10 @@ class Groups {
                     res.writeHead(200, {"Content-Type": "text/json"});
                 }
 
-                res.end(JSON.stringify(result));
+                let jsonResult = JSON.stringify(result);
+                out.logToFile(jsonResult);
+
+                res.end(jsonResult);
             });
         }
     }
@@ -74,7 +80,10 @@ class Groups {
                 res.writeHead(200, {"Content-Type": "text/json"});
             }
 
-            res.end(JSON.stringify(result));
+            let jsonResult = JSON.stringify(result);
+            out.logToFile(jsonResult);
+
+            res.end(jsonResult);
         });
     }
 
@@ -88,6 +97,9 @@ class Groups {
         req.on('data', function (data) {
             requestBody += data;
             let groupJsonData = JSON.parse(requestBody);
+
+            out.logToFile(requestBody);
+
             let groupModel = group.parseFromSCIMResource(groupJsonData);
 
             db.createGroup(groupModel, reqUrl, function (result) {
@@ -103,7 +115,10 @@ class Groups {
                     res.writeHead(201, {"Content-Type": "text/json"});
                 }
 
-                res.end(JSON.stringify(result));
+                let jsonResult = JSON.stringify(result);
+                out.logToFile(jsonResult);
+
+                res.end(jsonResult);
             });
         });
     }
@@ -121,6 +136,9 @@ class Groups {
         req.on("data", function (data) {
             requestBody += data;
             let jsonReqBody = JSON.parse(requestBody);
+
+            out.logToFile(requestBody);
+
             let operation = jsonReqBody["Operations"][0]["op"];
             let value = jsonReqBody["Operations"][0]["value"];
             let attribute = Object.keys(value)[0];
@@ -140,14 +158,21 @@ class Groups {
                         res.writeHead(200, {"Content-Type": "text/json"});
                     }
 
-                    res.end(JSON.stringify(result));
+                    let jsonResult = JSON.stringify(result);
+                    out.logToFile(jsonResult);
+
+                    res.end(jsonResult);
                 });
             } else {
                 out.log("WARN", "Groups.patchGroup", "The requested operation, " + operation + ", is not supported!");
 
                 let scimError = scimCore.createSCIMError("Operation Not Supported", "403");
                 res.writeHead(403, {"Content-Type": "text/plain"});
-                res.end(JSON.stringify(scimError));
+
+                let jsonResult = JSON.stringify(scimError);
+                out.logToFile(jsonResult);
+
+                res.end(jsonResult);
             }
         });
     }
@@ -165,6 +190,9 @@ class Groups {
         req.on("data", function (data) {
             requestBody += data;
             let groupJsonData = JSON.parse(requestBody);
+
+            out.logToFile(requestBody);
+
             let groupModel = group.parseFromSCIMResource(groupJsonData);
 
             db.updateGroup(groupModel, groupId, reqUrl, function (result) {
@@ -180,7 +208,10 @@ class Groups {
                     res.writeHead(200, {"Content-Type": "text/json"});
                 }
 
-                res.end(JSON.stringify(result));
+                let jsonResult = JSON.stringify(result);
+                out.logToFile(jsonResult);
+
+                res.end(jsonResult);
             });
         });
     }

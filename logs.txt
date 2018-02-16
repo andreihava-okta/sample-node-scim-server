@@ -1,0 +1,108 @@
+[ 16/02/2018 13:49:55:559 ] [ INFO ] [ ServerStartup ] Listening on port 8081
+[ 16/02/2018 13:49:55:559 ] [ INFO ] [ Users.patchUser ] Got request: /scim/v2/Users/beba8220-07b1-11e8-81e2-6d7cc1057e6d
+{
+  "schemas": [
+    "urn:ietf:params:scim:api:messages:2.0:PatchOp"
+  ],
+  "Operations": [
+    {
+      "op": "replace",
+      "value": {
+        "active": false
+      }
+    }
+  ]
+}
+
+Reponse:
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "id": "beba8220-07b1-11e8-81e2-6d7cc1057e6d",
+  "userName": "scim.test.thursday@okta.com",
+  "name": {
+    "givenName": "SCIM",
+    "middleName": "",
+    "familyName": "Thursday"
+  },
+  "emails": [
+    {
+      "primary": true,
+      "value": "scim.test.thursday@okta.com",
+      "type": "work"
+    }
+  ],
+  "active": "false",
+  "groups": [
+    {
+      "value": "d21e0a30-07b1-11e8-81e2-6d7cc1057e6d",
+      "$ref": "../Groups/d21e0a30-07b1-11e8-81e2-6d7cc1057e6d",
+      "display": "Thursday Test"
+    }
+  ],
+  "meta": {
+    "resourceType": "User",
+    "location": "/scim/v2/Users/beba8220-07b1-11e8-81e2-6d7cc1057e6d"
+  }
+}
+
+[ 16/02/2018 13:49:55:559 ] [ INFO ] [ Users.listUsers ] Got request: /scim/v2/Users?filter=userName+eq+%22scim.test.friday%40okta.com%22&startIndex=1&count=100
+{
+  "Resources": [],
+  "itemsPerPage": 0,
+  "schemas": [
+    "urn:ietf:params:scim:api:messages:2.0:ListResponse"
+  ],
+  "startIndex": "1",
+  "totalResults": 0
+}
+
+[ 16/02/2018 13:49:55:559 ] [ INFO ] [ Users.createUser ] Got request: /scim/v2/Users
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "userName": "scim.test.friday@okta.com",
+  "name": {
+    "givenName": "SCIM",
+    "familyName": "Thursday"
+  },
+  "emails": [
+    {
+      "primary": true,
+      "value": "scim.test.thursday@okta.com",
+      "type": "work"
+    }
+  ],
+  "externalId": "00uduy35cw8uUkrDQ0h7",
+  "groups": [],
+  "password": "60nDcmYd",
+  "active": true
+}
+
+Response:
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User"
+  ],
+  "id": "5250fa40-1320-11e8-8108-37c78b628f59",
+  "userName": "scim.test.friday@okta.com",
+  "name": {
+    "givenName": "SCIM",
+    "familyName": "Thursday"
+  },
+  "emails": [
+    {
+      "primary": true,
+      "value": "scim.test.thursday@okta.com",
+      "type": "work"
+    }
+  ],
+  "active": true,
+  "groups": null,
+  "meta": {
+    "resourceType": "User",
+    "location": "/scim/v2/Users"
+  }
+}
