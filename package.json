@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/SohaibAjmal/Okta-Scim-Server.git"
   },
-  "author": "Sohaib Ajmal & Andrei Hava",
+  "author": "Sohaib Ajmal & Andrei Hava, Menno Pieters",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/SohaibAjmal/Okta-Scim-Server/issues"
@@ -19,6 +19,8 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
+	"express-basic-auth": "^1.1.6",
+	"ssha": "^1.0.1",
     "fs": "0.0.1-security",
     "moment": "^2.20.1",
     "sqlite3": "^3.1.13",

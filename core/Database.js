@@ -11,6 +11,11 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
+ *  
+ *  Copyright © 2019, SailPoint Technologies
+ *  Modifications:
+ *  - addGroupMembership
+ *  - improved query safety (more to do) 
  */
 
 let sqlite3 = require('sqlite3').verbose();
@@ -202,10 +207,10 @@ class Database {
     }
 
     static async getUser(userId, reqUrl, callback) {
-        let query = "SELECT * FROM Users WHERE id = '" + String(userId) + "'";
+        let query = "SELECT * FROM Users WHERE id = ?";
         let self = this;
 
-        await db.get(query, async function (err, rows) {
+        await db.get(query, String(userId), async function (err, rows) {
             if (err !== null) {
                 out.error("Database.getUser", err);
 
@@ -226,10 +231,10 @@ class Database {
     }
 
     static async getGroup(groupId, reqUrl, callback) {
-        let query = "SELECT * FROM Groups WHERE id = '" + String(groupId) + "'";
+        let query = "SELECT * FROM Groups WHERE id = ?";
         let self = this;
 
-        await db.get(query, async function (err, rows) {
+        await db.get(query, String(groupId), async function (err, rows) {
             if (err !== null) {
                 out.error("Database.getGroup", err);
 
@@ -250,9 +255,9 @@ class Database {
     }
 
     static async createUser(userModel, reqUrl, callback) {
-        let query = "SELECT * FROM Users WHERE userName='" + userModel["userName"] + "'";
+        let query = "SELECT * FROM Users WHERE userName=?";
 
-        await db.get(query, function (err, rows) {
+        await db.get(query, userModel["userName"], function (err, rows) {
             if (err !== null) {
                 out.error("Database.createUser::SELECT", err);
 
@@ -572,6 +577,22 @@ class Database {
                 callback(null, memberships);
             }
         });
+    }
+    
+    static async addGroupMembership(userId, groupId, reqUrl, callback) {
+    	out.log("ERROR", "Database.addGroupMembership", "userId: " + userId + "; groupId: " + groupId + "; reqUrl: " + reqUrl);
+    	let self = this;
+    	let query = "INSERT INTO GroupMemberships (id, groupId, userId) VALUES(?, ?, ?)";
+    	membershipId = String(uuid.v1());
+    	
+    	db.run(query, membershipId, groupId, userId, async function (err) {
+            if (err !== null) {
+                out.error("Database.addGroupMembership::INSERT", err);
+                callback(scimCore.createSCIMError(err, "400"));
+            } else {
+            	this.getUser(userId, reqUrl, callback);
+            }
+    	});
     }
 
     static getGroupsForUser(userId, memberships) {

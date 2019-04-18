@@ -56,9 +56,12 @@ class SCIMCore {
         let location = "";
 
         for (let i = (startIndex - 1); i <count; i++) {
-            location = reqUrl + "/" + rows[i]["id"];
+        	let row = rows[i];
+        	if (row !== undefined) {
+        		location = reqUrl + "/" + rows[i]["id"];
 
-            resources.push(this.parseSCIMGroup(rows[i], location));
+        		resources.push(this.parseSCIMGroup(rows[i], location));
+        	}
             location = "";
         }
 

@@ -1,3 +1,23 @@
+/** Copyright © 2016-2018, Okta, Inc.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *  
+ *  Copyright © 2019, SailPoint Technologies
+ *  Modifications:
+ *  - Patch: add operation
+ *  - Patch: return modified object (https://tools.ietf.org/html/rfc7644#section-3.5.2) 
+ */
+
 let url = require('url');
 let scimCore = require('../core/SCIMCore');
 let db = require('../core/Database');
@@ -133,49 +153,91 @@ class Groups {
 
         let requestBody = "";
 
-        req.on("data", function (data) {
-            requestBody += data;
-            let jsonReqBody = JSON.parse(requestBody);
+        req.on("data", function(data) {
+          requestBody += data;
+          let jsonReqBody = JSON.parse(requestBody);
+          let jsonResult = '';
 
-            out.logToFile(requestBody);
+          out.logToFile(requestBody);
 
-            let operation = jsonReqBody["Operations"][0]["op"];
-            let value = jsonReqBody["Operations"][0]["value"];
-            let attribute = Object.keys(value)[0];
-            let attributeValue = value[attribute];
+          let operations = jsonReqBody["Operations"];
+          let i = 0;
+          let error = false;
+          let statusCode = "200";
+          let result = {};
+          for (i = 0; i < operations.length; i++) {
+            let operation = operations[i]["op"];
+            let path = operations[i]["path"];
+            out.log("ERROR", "Groups.patchGroup", "Operation " + operation + ", path " + path);
 
-            if (operation === "replace") {
-                db.patchGroup(attribute, attributeValue, groupId, reqUrl, function (result) {
-                    if (result["status"] !== undefined) {
-                        if (result["status"] === "400") {
-                            res.writeHead(400, {"Content-Type": "text/plain"});
-                        } else if (result["status"] === "409") {
-                            res.writeHead(409, {"Content-Type": "text/plain"});
-                        }
+            if (operation === "replace" || (operation === "add" && path === undefined)) {
+              let value = operations[i]["value"];
+              let attributes = Object.keys(value);
+              let j = 0;
+              for (j = 0; j < attributes.length; j++) {
+                let attribute = attributes[j];
+                let attributeValue = value[attribute];
 
-                        out.log("ERROR", "Groups.patchGroup", "Encountered error " + result["status"] + ": " + result["detail"]);
-                    } else {
-                        res.writeHead(200, {"Content-Type": "text/json"});
-                    }
+                db.patchGroup(attribute, attributeValue, groupId, reqUrl, function(result) {
+                  if (result["status"] !== undefined) {
+                    statusCode = result["status"];
+                    error = true;
+                    out.log("ERROR", "Groups.patchGroup", "Encountered error " + result["status"] + ": " + result["detail"]);
+                  }
 
-                    let jsonResult = JSON.stringify(result);
-                    out.logToFile(jsonResult);
-
-                    res.end(jsonResult);
+                  out.logToFile(JSON.stringify(result));
+                  if (error) {
+                    jsonResult += JSON.stringify(result);
+                  } else {
+                    jsonResult = JSON.stringify(result);
+                  }
                 });
+              }
+            } else if (operation === "add" && path !== undefined) {
+    	      let value = operations[i]["value"];
+    	      let attributes = Object.keys(value);
+    	      if (path === 'members') {
+    	       	let userIds = [];
+    	       	let memberValues = value["value"];
+    	       	if (memberValues !== undefined) {
+        	      Array.prototype.push.apply(userIds, memberValues)
+    	       	}
+    	       	let m = 0;
+    	       	while (error === false && m < userIds.length) {
+    	       	  userId = userIds[m];
+    	       	  out.log("ERROR", "Groups.patchGroup", "Group Id: " + groupId + "; UserId: " + userId)
+    	          m++;
+    		      db.addGroupMembership(userId, groupId, reqUrl, function(result) {
+    			    if (result["status"] !== undefined) {
+    			      statusCode = result["status"];
+    			      error = true;
+    				  out.log("ERROR", "Groups.patchGroup", "Encountered error " + result["status"] + ": " + result["detail"]);
+    				}
+    		      });
+    	        }
+    	      } else {
+    	      	// Ignore attributes
+    	      }
             } else {
-                out.log("WARN", "Groups.patchGroup", "The requested operation, " + operation + ", is not supported!");
+              out.log("WARN", "Groups.patchGroup", "The requested operation, " + operation + ", is not supported!");
+              out.log("WARN", "Groups.patchGroup", "The request body " + requestBody);
 
-                let scimError = scimCore.createSCIMError("Operation Not Supported", "403");
-                res.writeHead(403, {"Content-Type": "text/plain"});
+              let scimError = scimCore.createSCIMError("Operation Not Supported", "403");
+              statusCode = 403;
 
-                let jsonResult = JSON.stringify(scimError);
-                out.logToFile(jsonResult);
-
-                res.end(jsonResult);
+              jsonResult += JSON.stringify(scimError);
             }
+          }
+
+          if (statusCode != "200") {
+            res.writeHead(statusCode, { "Content-Type": "text/plain" });
+            out.logToFile("jsonResult: " + jsonResult);
+            res.end(jsonResult);
+          } else {
+        	Groups.getGroup(req, res);
+          }
         });
-    }
+      }
 
     static updateGroup(req, res) {
         out.log("INFO", "Groups.updateGroup", "Got request: " + req.url);

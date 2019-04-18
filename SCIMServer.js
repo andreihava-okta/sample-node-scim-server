@@ -11,21 +11,58 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
+ *
+ * Modified by Menno Pieters <menno.pieters@sailpoint.com> 2019.04.18:
+ * - Added ResourceTypes, Schemas endpoints to support SailPoint IdentityIQ 
+ *   schema discovery
+ * - Added Basic Authentication
+ * - Added ServiceProviderConfig for SailPoint IdentityIQ provisioning
+ * - Inserted "app.listener" for use in other modules.
  */
 
 let express = require('express');
+let basicAuth = require('express-basic-auth');
+let basicAuthorizer = require('./core/Authorizer');
 let app = express();
 let bodyParser = require('body-parser');
 let db = require('./core/Database');
 let out = require('./core/Logs');
 let cUsers = require('./components/Users');
 let cGroups = require('./components/Groups');
+let cResourceTypes = require('./components/ResourceTypes');
+let cSchemas = require('./components/Schemas');
+let cServiceProviderConfig = require('./components/ServiceProviderConfig');
 
+app.use(basicAuth(
+	{ 
+		authorizer: basicAuthorizer.authorizeUser,
+		challenge: true,
+		realm: 'SCIMServer',
+	} 
+));
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 let port = process.env.PORT || 8081; // Support for Heroku
+
+/**
+ * GET {{baseUrl}}/scim/v2/ResourceTypes
+ * List the supported resource types
+ */
+app.get('/scim/v2/ResourceTypes', cResourceTypes.listResourceTypes);
+
+/**
+ * GET {{baseUrl}}/scim/v2/ServiceProviderConfig
+ * Return the service provider configuration
+ */
+app.get('/scim/v2/ServiceProviderConfig', cServiceProviderConfig.listServiceProviderConfig);
+
+/**
+ * GET {{baseUrl}}/scim/v2/Schemas
+ * List the supported schemas
+ */
+app.get('/scim/v2/Schemas', cSchemas.listSchemas);
 
 /**
  * GET {{baseUrl}}/scim/v2/Users
@@ -99,4 +136,5 @@ let server = app.listen(port, function () {
     out.log("INFO", "ServerStartup", "Listening on port " + port);
 
     db.dbInit();
+	app.listener = server;
 });
