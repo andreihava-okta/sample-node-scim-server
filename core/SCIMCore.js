@@ -104,7 +104,11 @@ class SCIMCore {
 
         scimUser["meta"]["location"] = reqUrl;
         scimUser["id"] = userId;
-        scimUser["active"] = active;
+        let activeValue = 'false';
+        if (active !== undefined && (active === 1 || active === '1' || active === 'true' || active === true)) {
+        	activeValue = 'true';
+        } 
+        scimUser["active"] = activeValue;
         scimUser["userName"] = userName;
         scimUser["name"]["givenName"] = givenName;
         scimUser["name"]["middleName"] = middleName;

@@ -116,6 +116,7 @@ class Users {
 
         req.on('data', function (data) {
             requestBody += data;
+            out.log("INFO", "Users.createUser", "Got request body: " + requestBody);
             let userJsonData = JSON.parse(requestBody);
 
             out.logToFile(requestBody);
