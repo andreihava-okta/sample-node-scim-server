@@ -23,7 +23,7 @@ class ResourceTypes {
 
         let urlParts = url.parse(req.url, true);
 		let urlPort = req.app.listener.address().port;
-		let urlBase = req.protocol + '://' + req.host + ':' + urlPort + req.url.substring(0, req.url.indexOf('/ResourceTypes'));
+		let urlBase = req.protocol + '://' + req.hostname + ':' + urlPort + req.url.substring(0, req.url.indexOf('/ResourceTypes'));
 		out.log("INFO", "ResourceTypes.listResourceTypes", urlBase);
 
 		let response = '{';

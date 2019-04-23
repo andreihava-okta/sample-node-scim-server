@@ -26,7 +26,7 @@ class ServiceProviderConfig {
 	
 	let urlParts = url.parse(req.url, true);
 	let urlPort = req.app.listener.address().port;
-	let urlBase = req.protocol + '://' + req.host + ':' + urlPort + req.url.substring(0, req.url.indexOf('/ServiceProviderConfig'));
+	let urlBase = req.protocol + '://' + req.hostname + ':' + urlPort + req.url.substring(0, req.url.indexOf('/ServiceProviderConfig'));
 	
 	if (spconfig == '') {
 		spconfig = fs.readFileSync('data/service_provider_config.json', 'utf8');

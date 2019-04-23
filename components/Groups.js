@@ -193,31 +193,47 @@ class Groups {
                   }
                 });
               }
-            } else if (operation === "add" && path !== undefined) {
-    	      let value = operations[i]["value"];
-    	      let attributes = Object.keys(value);
-    	      if (path === 'members') {
-    	       	let userIds = [];
-    	       	let memberValues = value["value"];
-    	       	if (memberValues !== undefined) {
-        	      Array.prototype.push.apply(userIds, memberValues)
-    	       	}
-    	       	let m = 0;
-    	       	while (error === false && m < userIds.length) {
-    	       	  userId = userIds[m];
-    	       	  out.log("ERROR", "Groups.patchGroup", "Group Id: " + groupId + "; UserId: " + userId)
-    	          m++;
-    		      db.addGroupMembership(userId, groupId, reqUrl, function(result) {
-    			    if (result["status"] !== undefined) {
-    			      statusCode = result["status"];
-    			      error = true;
-    				  out.log("ERROR", "Groups.patchGroup", "Encountered error " + result["status"] + ": " + result["detail"]);
-    				}
-    		      });
-    	        }
-    	      } else {
-    	      	// Ignore attributes
+            } else if (operation === "add" && path !== undefined && path === 'members') {
+    	      let valueArr = operations[i]["value"];
+    	      
+    	      if (valueArr !== undefined && valueArr.length > 0) {
+    	    	var k = 0;
+    	    	for(k = 0; k < valueArr.length; k++) {
+    	    	  let value = valueArr[k];
+     	       	  let userIds = [];
+	    	      let memberValues = value["value"];
+	    	      if (memberValues !== undefined) {
+	    	    	if (Array.isArray(memberValues)) {
+ 	        	      userIds.push.apply(userIds, memberValues);
+	    	    	} else {
+	    	    	  userIds.push(memberValues);
+	    	    	}
+	    	      }
+	    	      let m = 0;
+	    	      while (error === false && m < userIds.length) {
+	    	        let userId = userIds[m];
+	    	        out.log("ERROR", "Groups.patchGroup", "Group Id: " + groupId + "; UserId: " + userId)
+	    	        m++;
+	    		    db.addGroupMembership(userId, groupId, reqUrl, function(result) {
+	    			  if (result["status"] !== undefined) {
+	    			    statusCode = result["status"];
+	    			    error = true;
+	    				out.log("ERROR", "Groups.patchGroup", "Encountered error " + result["status"] + ": " + result["detail"]);
+	    			  }
+	    		    });
+	    	      }
+    	    	}
     	      }
+            } else if (operation === "remove" && path !== undefined && path.startsWith("members[value eq \"")) {
+            	let userId = path.substring("members[value eq \"".length);
+            	userId = userId.substring(0, userId.indexOf("\""));
+	    		db.removeGroupMembership(userId, groupId, reqUrl, function(result) {
+	  	    	  if (result["status"] !== undefined) {
+	  	    		statusCode = result["status"];
+	  	    		error = true;
+	  	    		out.log("ERROR", "Groups.patchGroup", "Encountered error " + result["status"] + ": " + result["detail"]);
+	  	    	  }
+	  	    	});
             } else {
               out.log("WARN", "Groups.patchGroup", "The requested operation, " + operation + ", is not supported!");
               out.log("WARN", "Groups.patchGroup", "The request body " + requestBody);

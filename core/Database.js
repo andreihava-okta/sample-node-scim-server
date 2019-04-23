@@ -583,14 +583,29 @@ class Database {
     	out.log("ERROR", "Database.addGroupMembership", "userId: " + userId + "; groupId: " + groupId + "; reqUrl: " + reqUrl);
     	let self = this;
     	let query = "INSERT INTO GroupMemberships (id, groupId, userId) VALUES(?, ?, ?)";
-    	membershipId = String(uuid.v1());
+    	let membershipId = String(uuid.v1());
     	
     	db.run(query, membershipId, groupId, userId, async function (err) {
             if (err !== null) {
                 out.error("Database.addGroupMembership::INSERT", err);
                 callback(scimCore.createSCIMError(err, "400"));
             } else {
-            	this.getUser(userId, reqUrl, callback);
+            	Database.getUser(userId, reqUrl, callback);
+            }
+    	});
+    }
+
+    static async removeGroupMembership(userId, groupId, reqUrl, callback) {
+    	out.log("ERROR", "Database.addGroupMembership", "userId: " + userId + "; groupId: " + groupId + "; reqUrl: " + reqUrl);
+    	let self = this;
+    	let query = "DELETE FROM GroupMemberships WHERE groupId = ? AND userId = ?";
+    	
+    	db.run(query, groupId, userId, async function (err) {
+            if (err !== null) {
+                out.error("Database.removeGroupMembership::DELETE", err);
+                callback(scimCore.createSCIMError(err, "400"));
+            } else {
+            	Database.getUser(userId, reqUrl, callback);
             }
     	});
     }
