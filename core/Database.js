@@ -481,15 +481,16 @@ class Database {
                     let groups = userModel["groups"];
                     let error = null;
                     query = "DELETE FROM GroupMemberships WHERE userId = ?";
-                    await db.run(query, function(err) {
+                    await db.run(query, userId, function(err) {
                     	error = err;
                     });
 
                     for (let i = 0; i < groups.length && error === null; i++) {
+                    	let groupId = groupd[i];
                     	addGroupMembership(userId, groupId, reqUrl, function(err) {
                     		error = err;
                     	});
-                    }}
+                    }
                     if (err !== null) {
                         out.error("Database.updateUser::MEMBERSHIPS", err);
                         callback(scimCore.createSCIMError(err, "400"));
@@ -524,31 +525,25 @@ class Database {
                     }
 
                     let members = groupModel["members"];
-                    let membershipId = null;
-//TODO
-                    query = "INSERT INTO GroupMemberships (id, userId, groupId) VALUES";
+                    let error = null;
+                    query = "DELETE FROM GroupMemberships WHERE groupId = ?";
+                    await db.run(query, groupId, function(err) {
+                    	error = err;
+                    });
 
                     for (let i = 0; i < members.length; i++) {
-                        if (i > 0) {
-                            query = query + ",";
-                        }
-
-                        membershipId = String(uuid.v1());
-
-                        query = query + " ('" + membershipId + "', '" + members[i]["value"] + "', '" + groupId + "')";
+                    	let userId = members[i];
+                    	addGroupMembership(userId, groupId, reqUrl, function(err) {
+                    		error = err;
+                    	});
                     }
 
-                    query = query + ";";
-
-                    await db.run(query, function (err) {
-                        if (err !== null) {
-                            out.error("Database.updateGroup::MEMBERSHIPS", err);
-
-                            callback(scimCore.createSCIMError(err, "400"));
-                        } else {
-                            callback(scimCore.createSCIMGroup(groupId, groupModel["displayName"], members, reqUrl));
-                        }
-                    });
+                    if (err !== null) {
+                        out.error("Database.updateGroup::MEMBERSHIPS", err);
+                        callback(scimCore.createSCIMError(err, "400"));
+                    } else {
+                        callback(scimCore.createSCIMGroup(groupId, groupModel["displayName"], members, reqUrl));
+                    }
                 });
             }
         });
