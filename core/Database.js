@@ -87,7 +87,7 @@ class Database {
     }
 
     static async getFilteredUsers(filterAttribute, filterValue, startIndex, count, reqUrl, callback) {
-    	if (filterAttribute !== undefined && ALLOWED_USER_FILTER_ATTRS.contains(filterAttribute.toLowerCase())) {
+    	if (filterAttribute !== undefined && ALLOWED_USER_FILTER_ATTRS.includes(filterAttribute.toLowerCase())) {
             let query = "SELECT * FROM Users WHERE " + filterAttribute + " = ?";
             let self = this;
 
@@ -122,7 +122,7 @@ class Database {
     }
 
     static async getFilteredGroups(filterAttribute, filterValue, startIndex, count, reqUrl, callback) {
-    	if (filterAttribute !== undefined && ALLOWED_USER_FILTER_ATTRS.contains(filterAttribute.toLowerCase())) {
+    	if (filterAttribute !== undefined && ALLOWED_USER_FILTER_ATTRS.includes(filterAttribute.toLowerCase())) {
             let query = "SELECT * FROM Groups WHERE " + filterAttribute + " = ?";
             let self = this;
 
@@ -381,7 +381,7 @@ class Database {
     }
 
     static async patchUser(attributeName, attributeValue, userId, reqUrl, callback) {
-    	if (ALLOWED_USER_UPDATE_ATTRS.contains(attributeName)) {
+    	if (ALLOWED_USER_UPDATE_ATTRS.includes(attributeName)) {
         	let query = "UPDATE Users SET " + attributeName + " = ? WHERE id = ?";
             let self = this;
 
@@ -419,7 +419,7 @@ class Database {
     }
 
     static async patchGroup(attributeName, attributeValue, groupId, reqUrl, callback) {
-    	if (ALLOWED_GROUP_UPDATE_ATTRS.contains(attributeName)) {
+    	if (ALLOWED_GROUP_UPDATE_ATTRS.includes(attributeName)) {
         	let query = "UPDATE Groups SET " + attributeName + " = ? WHERE id = ?";
             let self = this;
 
