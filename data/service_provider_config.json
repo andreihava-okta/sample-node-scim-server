@@ -1,0 +1,36 @@
+{
+  "filter": {
+    "maxResults": 1000,
+    "supported": true
+  },
+  "patch": {
+    "supported": true
+  },
+  "authenticationSchemes": [{
+    "documentationUri": "https://www.npmjs.com/package/express-basic-auth",
+    "name": "HTTP Basic",
+    "description": "Authentication Scheme using the Http Basic Standard",
+    "specUri": "http://www.ietf.org/rfc/rfc2617.txt",
+    "type": "httpbasic"
+  }],
+  "documentationUri": "https://github.com/andreihava-okta/sample-node-scim-server",
+  "meta": {
+    "location": "%%BASEURL%%/scim/v2/ServiceProviderConfig",
+    "resourceType": "ServiceProviderConfig"
+  },
+  "schemas": ["urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"],
+  "etag": {
+    "supported": true
+  },
+  "sort": {
+    "supported": true
+  },
+  "bulk": {
+    "maxPayloadSize": 0,
+    "maxOperations": 0,
+    "supported": false
+  },
+  "changePassword": {
+    "supported": false
+  }
+}

@@ -56,9 +56,12 @@ class SCIMCore {
         let location = "";
 
         for (let i = (startIndex - 1); i <count; i++) {
-            location = reqUrl + "/" + rows[i]["id"];
+        	let row = rows[i];
+        	if (row !== undefined) {
+        		location = reqUrl + "/" + rows[i]["id"];
 
-            resources.push(this.parseSCIMGroup(rows[i], location));
+        		resources.push(this.parseSCIMGroup(rows[i], location));
+        	}
             location = "";
         }
 
@@ -101,7 +104,11 @@ class SCIMCore {
 
         scimUser["meta"]["location"] = reqUrl;
         scimUser["id"] = userId;
-        scimUser["active"] = active;
+        let activeValue = 'false';
+        if (active !== undefined && (active === 1 || active === '1' || active === 'true' || active === true)) {
+        	activeValue = 'true';
+        } 
+        scimUser["active"] = activeValue;
         scimUser["userName"] = userName;
         scimUser["name"]["givenName"] = givenName;
         scimUser["name"]["middleName"] = middleName;

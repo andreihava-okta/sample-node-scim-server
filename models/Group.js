@@ -26,8 +26,10 @@ class Group  {
 
         let members = [];
 
-        for (let i = 0; i < groupJsonData["members"].length; i++) {
-            members.push(this.parseMemberships(groupJsonData["members"][i]));
+        if (groupJsonData["members"] !== undefined) {
+	        for (let i = 0; i < groupJsonData["members"].length; i++) {
+	            members.push(this.parseMemberships(groupJsonData["members"][i]));
+	        }
         }
 
         group["members"] = members;

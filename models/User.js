@@ -27,15 +27,21 @@ class User  {
 
         user["active"] = userJsonData["active"];
         user["userName"] = userJsonData["userName"];
-        user["givenName"] = userJsonData["name"]["givenName"];
-        user["middleName"] = userJsonData["name"]["middleName"];
-        user["familyName"] = userJsonData["name"]["familyName"];
-        user["email"] = userJsonData["emails"][0]["value"];
+        if (userJsonData["name"] !== undefined) {
+	        user["givenName"] = userJsonData["name"]["givenName"];
+	        user["middleName"] = userJsonData["name"]["middleName"];
+	        user["familyName"] = userJsonData["name"]["familyName"];
+        }
+        if (userJsonData["emails"] !== undefined) {
+        	user["email"] = userJsonData["emails"][0]["value"];
+        }
 
         let groups = [];
 
-        for (let i = 0; i < userJsonData["groups"].length; i++) {
-            groups.push(this.parseGroups(userJsonData["groups"][i]));
+        if (userJsonData["groups"] !== undefined) {
+	        for (let i = 0; i < userJsonData["groups"].length; i++) {
+	            groups.push(this.parseGroups(userJsonData["groups"][i]));
+	        }
         }
 
         user["groups"] = groups;
