@@ -4,6 +4,7 @@
   "description": "Sample SCIM server written in Node.js. It can be used with SCIM app in Okta for getting SCIM messages related to user provisioning. It supports following Users endpoints",
   "main": "node_scim_server.js",
   "scripts": {
+    "start": "node SCIMServer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,7 +22,7 @@
     "express": "^4.16.2",
     "fs": "0.0.1-security",
     "moment": "^2.20.1",
-    "sqlite3": "^3.1.13",
+    "sqlite3": "^5.0.8",
     "url": "^0.11.0",
     "uuid": "^3.2.1"
   },
