@@ -94,6 +94,11 @@ class Users {
         let reqUrl = urlParts.pathname;
         let requestBody = "";
 
+        if (!req.data) {
+            res.writeHead(400, {"Content-Type": "text/plain"});
+            res.end();
+        }
+
         req.on('data', function (data) {
             requestBody += data;
             let userJsonData = JSON.parse(requestBody);
@@ -132,6 +137,11 @@ class Users {
         let userId = req.params.userId;
 
         let requestBody = "";
+
+        if (!req.data) {
+            res.writeHead(400, {"Content-Type": "text/plain"});
+            res.end();
+        }
 
         req.on("data", function (data) {
             requestBody += data;
@@ -186,6 +196,10 @@ class Users {
         let userId = req.params.userId;
 
         let requestBody = "";
+        if (!req.data) {
+            res.writeHead(400, {"Content-Type": "text/plain"});
+            res.end();
+        }
 
         req.on("data", function (data) {
             requestBody += data;
