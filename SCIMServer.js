@@ -95,8 +95,7 @@ app.get('/scim/v2', function (req, res) {
     res.send('SCIM');
 });
 
-let server = app.listen(port, function () {
+let server = app.listen(port, async function () {
     out.log("INFO", "ServerStartup", "Listening on port " + port);
-
-    db.dbInit();
+    await db.dbInit();
 });
